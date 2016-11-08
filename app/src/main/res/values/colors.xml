@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#6a81ff</color>
+    <color name="colorPrimaryDark">#6a81ff</color>
+    <color name="colorAccent">#FF4081</color>
+
+    <color name="BROWN">#d4932b</color>
+    <color name="WATHET">#46f6fc</color>
+    <color name="VIOLET">#ce14f7</color>
+    <color name="ORANGE">#ffbb01</color>
+    <color name="CLARET">#e26643</color>
+    <color name="PINK">#ff94ef</color>
+</resources>

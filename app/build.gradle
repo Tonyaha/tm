@@ -1,0 +1,42 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.0"
+
+    defaultConfig {
+        applicationId "com.tm"
+        minSdkVersion 14
+        targetSdkVersion 23
+        versionCode 1
+        versionName "1.0"
+        multiDexEnabled=true //当方法数超过65535(方法的索引使用的是一个short值，
+        //而short最大值是65535)的时候允许打包成多个dex文件，动态加载dex。这里面坑很深啊
+    }
+    buildTypes {
+        release {
+            zipAlignEnabled true //zipAlign优化
+            shrinkResources false //移除无用的resource文件
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    dexOptions {
+        preDexLibraries = false
+        jumboMode = false
+        //让它不要对Lib做
+        //incremental true
+        //开启incremental 优化编译效率，这个功能android studio默认是关闭的。
+        javaMaxHeapSize "4g"     //增加java堆内存大小
+    }
+}
+
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    testCompile 'junit:junit:4.12'
+    compile 'com.android.support:appcompat-v7:25.0.0'
+    compile 'com.android.support:support-annotations:25.0.0'
+}
+
+

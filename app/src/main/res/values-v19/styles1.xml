@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="AppTheme1" parent="@android:style/Theme.Holo.Light">
+        <!--<item name="android:homeAsUpIndicator">@mipmap/title_return1</item>-->
+        <!--4.0版本以上透明状态栏
+        Support library compatibility-->
+        <item name="android:windowTranslucentStatus">true</item>
+
+    </style>
+</resources>
