@@ -12,32 +12,6 @@ import com.tm.view.MySurfaceView;
 
 import static com.tm.view.MySurfaceView.mPaint;
 
-/**
- * Created by TSM on 2016/10/21.
- * <p>
- * Bundle bundle = this.getIntent().getExtras(); //第一种方法接收intent传递的数据，这里是id
- * int id = bundle.getInt("name");
- * int id = getIntent().getExtras().getInt("name"); //第二种方法接收intent传递的数据，这里是id
- * imageView.setImageResource(id);
- * <p>
- * <p>
- * 第一种方法--及时回收bitmap内存：
- * 一般而言，回收bitmap内存可以用到以下代码
- * bitmap.recycle()方法用于回收该bitmap所占用的内存，接着将bitmap置空，最后，别忘了用System.gc()调用一下系统的垃圾回收器。
- * 在这里要声明一下，bitmap可以有多个（以为着可以有多个if语句），但System.gc()最好只有一个（所以我将它写在了if语句外），因为System.gc()
- * if(bitmap != null && !bitmap.isRecycled()){
- * bitmap.recycle();
- * bitmap = null;
- * }
- * System.gc();
- * <p>
- * //压缩，用于节省BITMAP内存空间--解决BUG的关键步骤
- * BitmapFactory.Options opts = new BitmapFactory.Options();
- * opts.inSampleSize = 2;    //这个的值压缩的倍数（2的整数倍），数值越小，压缩率越小，图片越清晰
- * <p>
- * //返回原图解码之后的bitmap对象
- * bitmap = BitmapFactory.decodeResource(Context, ResourcesId, opts);
- */
 
 public class ColourDraw_Activity extends Activity{
     private int paintStroke = 5;  //橡皮擦 和 笔 的大小
