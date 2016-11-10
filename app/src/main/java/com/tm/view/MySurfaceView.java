@@ -18,8 +18,10 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 import android.widget.Toast;
 
+import com.tm.ColourDraw_Activity;
 import com.tm.R;
 
 import java.io.File;
@@ -56,10 +58,10 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
     public static Paint mPaint;
 
     /*用于保存当前绘画的画布*/
-    private Canvas cacheCanvas;
+    public Canvas cacheCanvas;
 
     /*保存当前绘制的内容*/
-    private Bitmap cacheBitmap;
+    public Bitmap cacheBitmap;
 
     public MySurfaceView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
@@ -92,6 +94,31 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
         mPaint.setStyle(Paint.Style.STROKE);
 
         //mPaint.setStrokeWidth(15); //设置笔的大小
+        /*ColourDraw_Activity colourDraw_activity = new ColourDraw_Activity();
+        colourDraw_activity.btn_eraser.setOnTouchListener(new OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent event) {
+
+                if (event.getAction() == MotionEvent.ACTION_MOVE) {
+                    //获得按下坐标
+                    int x = (int) event.getX();
+                    int y = (int) event.getY();
+
+                    for (int i = x - 10; i < x + 10; i++) {
+                        for (int j = y - 10; j < y + 10; j++) {
+                            //防止超出边界
+                            if (j >= 0 && j<cacheBitmap.getHeight() && i >= 0 && i < cacheBitmap.getWidth()) {
+                                cacheBitmap.setPixel(i, j, Color.TRANSPARENT);
+                            }
+                        }
+                    }
+                    //修改后的图片设置给ImageView
+                    cacheCanvas.setBitmap(cacheBitmap);
+                }
+
+                return true; //true 消耗掉这次触摸事件.false 不消耗
+            }
+        });*/
     }
 
     /**
@@ -110,6 +137,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
                 break;
             case MotionEvent.ACTION_MOVE:
                 mPath.lineTo(x, y);
+                //eraserPaint();
                 break;
             case MotionEvent.ACTION_UP:
                 break;
