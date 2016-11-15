@@ -9,7 +9,9 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.AttributeSet;
@@ -18,16 +20,22 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 import android.widget.Toast;
 
+import com.tm.ColourDraw_Activity;
 import com.tm.R;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.UUID;
 
 import static android.R.attr.path;
+import static android.app.Activity.RESULT_OK;
 
 
 /**
@@ -38,6 +46,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
     public static int myID;  //接收从其他activity传来数据的变量
     public int mScreenWidth; //屏幕的宽
     public int mScreenHeight;
+    public  Bitmap bg_bitmap = null;
 
 
     /*是否处于绘制状态*/
@@ -47,7 +56,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
     private SurfaceHolder mHolder;
 
     /*SurfaceHolder的画布*/
-    private Canvas mCanvas;
+    public Canvas mCanvas; //负责将痕迹画在屏幕上
 
     /*路径*/
     public static Path mPath;
@@ -56,10 +65,10 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
     public static Paint mPaint;
 
     /*用于保存当前绘画的画布*/
-    private Canvas cacheCanvas;
+    public Canvas cacheCanvas;
 
     /*保存当前绘制的内容*/
-    private Bitmap cacheBitmap;
+    public Bitmap cacheBitmap;
 
     public MySurfaceView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
@@ -87,11 +96,16 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
         mPath = new Path();
 
         mPaint = new Paint();
-        mPaint.setAntiAlias(true);
-        mPaint.setColor(getResources().getColor(R.color.ORANGE));
+        mPaint.setAntiAlias(true);//抗锯齿
+        mPaint.setColor(Color.BLACK);
         mPaint.setStyle(Paint.Style.STROKE);
 
+        //mPaint.setAlpha(100);  //设置透明度为0
+        mPaint.setStrokeJoin(Paint.Join.ROUND); //结合方式，平滑
+        mPaint.setStrokeCap(Paint.Cap.ROUND);  //圆头
+
         //mPaint.setStrokeWidth(15); //设置笔的大小
+
     }
 
     /**
@@ -110,6 +124,8 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
                 break;
             case MotionEvent.ACTION_MOVE:
                 mPath.lineTo(x, y);
+
+                //eraserPaint();
                 break;
             case MotionEvent.ACTION_UP:
                 break;
@@ -117,7 +133,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
                 break;
         }
         invalidate();
-        return super.onTouchEvent(event);
+        return super.onTouchEvent(event); //消耗触摸事件  false为不消耗
     }
 
     /*  线程工作函数  */
@@ -137,6 +153,8 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
         }
     }
 
+
+
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
         mIsDrawing = true;
@@ -146,26 +164,33 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 
     private void initCacheBitmapAndDrawBackground(boolean isFirst) {
 
-        Bitmap bg_bitmap = BitmapFactory.decodeResource(getResources(), myID);
+        BitmapFactory.Options opts = new BitmapFactory.Options(); //图片加载器，用于配置一些缩放比例，和像素单位
+        opts.inSampleSize = 0; //制定加载器把原图片的宽高缩放到2/1的效果加载
+
+
+        if(ColourDraw_Activity.imgSelectedFlag == false){
+            bg_bitmap = BitmapFactory.decodeResource(getResources(), myID,opts);
+            ColourDraw_Activity.imgSelectedFlag = true;
+        }
+
 
         Matrix matrix = new Matrix();
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();  //获取屏幕大小的方法
         mScreenWidth = displayMetrics.widthPixels;
         mScreenHeight = displayMetrics.heightPixels; //为什么要减掉 50
-        bg_bitmap = Bitmap.createScaledBitmap(bg_bitmap, mScreenWidth, mScreenHeight, true); // bitmap填满屏幕
+        bg_bitmap = Bitmap.createScaledBitmap(bg_bitmap, getWidth(), getHeight(), true); // bitmap填满屏幕
 
         if (isFirst) { //第一次初始化cache画布的时候
-            cacheBitmap = Bitmap.createBitmap(mScreenWidth, mScreenHeight, Bitmap.Config.ARGB_8888);
+            cacheBitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
             //cacheBitmap = Bitmap.createScaledBitmap(bg_bitmap,mScreenWidth,mScreenHeight,true); //填满屏幕
+
             cacheCanvas = new Canvas();
             //设置都画在这个位图上
             cacheCanvas.setBitmap(cacheBitmap);
         }
 
-        cacheCanvas.drawColor(Color.WHITE);//绘制背景色
-        cacheCanvas.drawBitmap(bg_bitmap, matrix, null);// 必须把Bitmap绘制到画布上?
-
-
+        cacheCanvas.drawColor(Color.TRANSPARENT);
+        cacheCanvas.drawBitmap(bg_bitmap,matrix,null);
 
 
         /*  缩放 bitmap  再 绘制到画布上
@@ -220,6 +245,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
             }
         }
 
+
     }
 
 /* 设置颜色 *//*
@@ -247,7 +273,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 
     /*  保存图片 */
 
-    public void saveImageToGallery() {
+    public File saveImageToGallery() {
         // 首先保存图片
         //File file = new File("/sdcard/DCIM/mPicture/");
         File appDir = new File(Environment.getExternalStorageDirectory(), "/DCIM/mPicture/");
@@ -257,8 +283,9 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
         //String m =  String.valueOf(Calendar.YEAR) + String.valueOf((Calendar.MONTH+1)) + String.valueOf(Calendar.DAY_OF_MONTH);
 
         //String fileName ="IMG" + System.nanoTime()+ ".jpg";//System.currentTimeMillis() + ".jpg";
-        String fileName = myID+ ".jpg";
-        File file = new File(appDir, fileName);
+        File fileName = new File(myID + ".jpg");
+        //File f = new File(fPath, UUID.randomUUID().toString() + ".png");
+        File file = new File(appDir, fileName.toString());
         try {
             FileOutputStream fos = new FileOutputStream(file);
             cacheBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
@@ -275,7 +302,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
         // 其次把文件插入到系统图库
         try {
             MediaStore.Images.Media.insertImage(getContext().getContentResolver(),
-                    file.getAbsolutePath(), fileName, null);
+                    file.getAbsolutePath(), fileName.toString(), null);
             //提示出来的啊  啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊
             Toast.makeText(getContext(), "*　保存成功　*", Toast.LENGTH_SHORT).show();
         } catch (FileNotFoundException e) {
@@ -283,6 +310,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
         }
         // 最后通知图库更新
         getContext().sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + path)));
+        return fileName;
     }
 
     @Override
@@ -294,7 +322,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
 
         // 回收
-        if (cacheBitmap != null && !cacheBitmap.isRecycled()){
+        if (cacheBitmap != null && !cacheBitmap.isRecycled()) {
             cacheBitmap.recycle();
             cacheBitmap = null;
             System.gc();
@@ -302,4 +330,5 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
         }
         mIsDrawing = false;
     }
+
 }

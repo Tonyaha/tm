@@ -1,7 +1,16 @@
 package com.tm;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.animation.AnimationUtils;
@@ -9,6 +18,9 @@ import android.widget.Button;
 import android.widget.ImageButton;
 
 import com.tm.view.MySurfaceView;
+
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 import static com.tm.view.MySurfaceView.mPaint;
 
@@ -42,7 +54,12 @@ import static com.tm.view.MySurfaceView.mPaint;
 public class ColourDraw_Activity extends Activity{
     private int paintStroke = 5;  //橡皮擦 和 笔 的大小
     private int sizeCount = 0; //点了 放大缩小几次
-    private Button btn_width;  //笔的大小
+
+    private Button btn_width,btn_select,btn_share, btn_camera;  //笔的大小
+
+    private static final int SELECT_PHOTO = 100;
+    private static final int CAMERA_REQUEST = 1888;
+    public static boolean imgSelectedFlag = false;
 
     private boolean isVisible = true;
     public ImageButton btn_black, btn_brown, btn_wathet, btn_green, btn_violet, btn_blue, btn_orange, btn_claret, btn_pink, btn_yellow, btn_gray, btn_red,
@@ -74,7 +91,7 @@ public class ColourDraw_Activity extends Activity{
 
         mPaint.setStrokeWidth(paintStroke);//初始笔大小
         surfaceView = (MySurfaceView) findViewById(R.id.surfaceview);
-        lastSelectPen = findViewById(R.id.orange_imageView); //默认铅笔
+        lastSelectPen = findViewById(R.id.black_imageView); //默认铅笔
         lastSelectPen.startAnimation(AnimationUtils.loadAnimation(ColourDraw_Activity.this, R.anim.scale_zoom_out_anim));
 
 
@@ -94,9 +111,11 @@ public class ColourDraw_Activity extends Activity{
         btn_violet = (ImageButton) findViewById(R.id.violet_imageView);
         btn_wathet = (ImageButton) findViewById(R.id.wathet_imageView);
         btn_yellow = (ImageButton) findViewById(R.id.yellow_imageView);
+
         btn_width = (Button) findViewById(R.id.paint_stroke);
-
-
+        btn_select = (Button) findViewById(R.id.img_select);
+        btn_share = (Button) findViewById(R.id.img_share);
+        btn_camera = (Button) findViewById(R.id.img_camera);
 
         MyOnClickListener myOnClickListener = new MyOnClickListener();
         btn_yellow.setOnClickListener(myOnClickListener);
@@ -115,7 +134,11 @@ public class ColourDraw_Activity extends Activity{
         btn_orange.setOnClickListener(myOnClickListener);
         btn_pink.setOnClickListener(myOnClickListener);
         btn_preservation.setOnClickListener(myOnClickListener);
+
         btn_width.setOnClickListener(myOnClickListener);
+        btn_select.setOnClickListener(myOnClickListener);
+        btn_share.setOnClickListener(myOnClickListener);
+        btn_camera.setOnClickListener(myOnClickListener);
 
 
         //设置控件是否显示
@@ -279,7 +302,8 @@ public class ColourDraw_Activity extends Activity{
                 case R.id.eraser_imageView:
                     playAnim(v);
                     MySurfaceView.mPath.reset();//重置当前路径
-                    mPaint.setColor(Color.WHITE);
+                    mPaint.setColor(Color.BLACK);
+                    mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
                     //surfaceView.setEraserPaint();
                     break;
                 case R.id.clear_imageButton:
@@ -293,6 +317,7 @@ public class ColourDraw_Activity extends Activity{
 
                     break;
                 case R.id.home_imageButton:
+                    imgSelectedFlag = false;
                     finish();
                     break;
                 case R.id.preservation_imageButton:
@@ -321,8 +346,80 @@ public class ColourDraw_Activity extends Activity{
                             MySurfaceView.mPaint.setStrokeWidth(15);
                         }
                     }*/
+                case R.id.img_select:
+                    surfaceView.clean();
+                    Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+                    photoPickerIntent.setType("image/*");
+                    startActivityForResult(photoPickerIntent, SELECT_PHOTO);
+                    break;
+                case R.id.img_share:
+                    Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                    shareIntent.setType("image/jpg");
+                    shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(surfaceView.saveImageToGallery().getAbsolutePath())); //"file:///sdcard/temporary_file.jpg"
+                    startActivity(Intent.createChooser(shareIntent, "Share Image"));
+                    break;
+            }
+
+            if(v == btn_camera){
+                surfaceView.clean();
+                Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(cameraIntent, CAMERA_REQUEST); //CAMERA_REQUEST
             }
         }
     }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
+        super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
 
+        switch (requestCode) {
+
+            case SELECT_PHOTO:
+                if (resultCode == RESULT_OK) {
+                    Uri selectedImage = imageReturnedIntent.getData();
+                    InputStream imageStream = null;
+                    try {
+                        imageStream = getContentResolver().openInputStream(selectedImage);
+                        if (imgSelectedFlag == true) {
+                            surfaceView.bg_bitmap = BitmapFactory.decodeStream(imageStream);
+                        }
+
+                        /*Bitmap bitmap = BitmapFactory.decodeStream(imageStream);
+                        BitmapDrawable ob = new BitmapDrawable(getResources(), bitmap);
+                        if(Build.VERSION.SDK_INT >= 16)
+                        {
+                            //surfaceView.setBackground(ob);
+                            //surfaceView.mCanvas.setBitmap(bgbitmap);
+                            //surfaceView.cacheCanvas.drawBitmap(surfaceView.bg_bitmap,0,0,null);
+                        }else {
+                            //surfaceView.setBackgroundDrawable(ob);
+                            //surfaceView.cacheCanvas.drawBitmap(surfaceView.bg_bitmap,0,0,null);
+
+                        }
+*/
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                }
+                break;
+            case CAMERA_REQUEST:
+                if (resultCode == RESULT_OK) {
+                    if (imgSelectedFlag == true) {
+                        surfaceView.bg_bitmap = (Bitmap) imageReturnedIntent.getExtras().get("data");
+                    }
+
+                   /* Bitmap photo = (Bitmap) imageReturnedIntent.getExtras().get("data");
+                    BitmapDrawable ob = new BitmapDrawable(getResources(), photo);
+
+                    if(Build.VERSION.SDK_INT >= 14)
+                    {
+                        //drawingView.setBackground(ob);
+                    }else {
+                       // drawingView.setBackgroundDrawable(ob);
+                    }
+                }*/
+
+                }
+        }
+        //imgSelectedFlag = false;
+    }
 }
