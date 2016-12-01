@@ -45,7 +45,7 @@
                     android:layout_width="match_parent"
                     android:layout_gravity="center_vertical"
                     android:background="@drawable/btn_gray"
-                    android:text="拍照"
+                    android:text="@string/take_photos"
                     android:textColor="@color/colorAccent"
                     android:textSize="17dp"
                     android:textAlignment="center"
@@ -57,14 +57,14 @@
                     android:layout_width="match_parent"
                     android:layout_gravity="center_vertical"
                     android:background="@drawable/btn_gray"
-                    android:text="分享"
+                    android:text="@string/share_pthotos"
                     android:textColor="@color/colorAccent"
                     android:textSize="17dp"
                     android:textAlignment="center"
                     android:layout_weight="1"
                     android:layout_height="0dp" />
 
-                <Button
+                <!--<Button
                     android:id="@+id/paint_stroke"
                     android:layout_width="match_parent"
                     android:layout_gravity="center"
@@ -73,6 +73,16 @@
                     android:textColor="@color/colorAccent"
                     android:textSize="20dp"
                     android:textAlignment="center"
+                    android:layout_weight="1"
+                    android:layout_height="0dp" />-->
+
+                <ImageButton
+                    android:id="@+id/paint_stroke"
+                    android:layout_width="match_parent"
+                    android:layout_gravity="center"
+                    android:src="@drawable/paint_size"
+                    android:background="@drawable/btn_gray"
+                    android:scaleType="fitCenter"
                     android:layout_weight="1"
                     android:layout_height="0dp" />
 
@@ -131,7 +141,7 @@
                 android:layout_height="45dp"
                 android:layout_gravity="bottom|center_vertical"
                 android:background="@drawable/btn_gray"
-                android:text="choose"
+                android:text="@string/choose_pthotos"
                 android:textColor="@color/colorAccent"
                 android:textSize="17dp"
                 android:textAlignment="center"

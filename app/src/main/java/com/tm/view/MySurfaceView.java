@@ -124,8 +124,6 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
                 break;
             case MotionEvent.ACTION_MOVE:
                 mPath.lineTo(x, y);
-
-                //eraserPaint();
                 break;
             case MotionEvent.ACTION_UP:
                 break;
@@ -151,6 +149,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
                 e.printStackTrace();
             }
         }
+
     }
 
 
@@ -322,9 +321,11 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
 
         // 回收
-        if (cacheBitmap != null && !cacheBitmap.isRecycled()) {
+        if ((cacheBitmap != null && !cacheBitmap.isRecycled()) || (bg_bitmap != null && !bg_bitmap.isRecycled())) {
             cacheBitmap.recycle();
             cacheBitmap = null;
+            bg_bitmap.recycle();
+            bg_bitmap = null;
             System.gc();
             Log.i("垃圾回收", "已经回收");
         }

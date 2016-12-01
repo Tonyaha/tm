@@ -55,8 +55,8 @@ public class ColourDraw_Activity extends Activity{
     private int paintStroke = 5;  //橡皮擦 和 笔 的大小
     private int sizeCount = 0; //点了 放大缩小几次
 
-    private Button btn_width,btn_select,btn_share, btn_camera;  //笔的大小
-
+    private Button btn_select,btn_share, btn_camera;  //笔的大小
+    private ImageButton btn_width;
     private static final int SELECT_PHOTO = 100;
     private static final int CAMERA_REQUEST = 1888;
     public static boolean imgSelectedFlag = false;
@@ -112,7 +112,7 @@ public class ColourDraw_Activity extends Activity{
         btn_wathet = (ImageButton) findViewById(R.id.wathet_imageView);
         btn_yellow = (ImageButton) findViewById(R.id.yellow_imageView);
 
-        btn_width = (Button) findViewById(R.id.paint_stroke);
+        btn_width = (ImageButton) findViewById(R.id.paint_stroke);
         btn_select = (Button) findViewById(R.id.img_select);
         btn_share = (Button) findViewById(R.id.img_share);
         btn_camera = (Button) findViewById(R.id.img_camera);
@@ -278,7 +278,7 @@ public class ColourDraw_Activity extends Activity{
                 case R.id.pink_imageView:
                     playAnim(v);
                     MySurfaceView.mPath.reset();//重置当前路径
-                    mPaint.setColor(getResources().getColor(R.color.PINK));
+                    mPaint.setColor(Color.parseColor("#ff94ef"));
                     //surfaceView.setPinkPaint();
                     break;
                 case R.id.yellow_imageView:
@@ -312,7 +312,7 @@ public class ColourDraw_Activity extends Activity{
                     MySurfaceView.mPath.reset();//重置当前路径
                     paintStroke = 5;
                     mPaint.setStrokeWidth(paintStroke);
-                    btn_width.setText(" size " + 5);
+                    //btn_width.setText(" size " + 5);
                     sizeCount = 0;
 
                     break;
@@ -328,6 +328,20 @@ public class ColourDraw_Activity extends Activity{
                     if (sizeCount < 3) {
                         paintStroke = paintStroke + 15;
                         mPaint.setStrokeWidth(paintStroke);
+                        //btn_width.setText(" size " + String.valueOf(paintStroke));
+                        sizeCount++;
+                    } else {
+                        paintStroke = 5;
+                        mPaint.setStrokeWidth(paintStroke);
+                       // btn_width.setText(" size " + String.valueOf(paintStroke));
+                        sizeCount = 0;
+                    }
+                    break;
+                /*case R.id.paint_stroke:
+                    MySurfaceView.mPath.reset();//重置当前路径
+                    if (sizeCount < 3) {
+                        paintStroke = paintStroke + 15;
+                        mPaint.setStrokeWidth(paintStroke);
                         btn_width.setText(" size " + String.valueOf(paintStroke));
                         sizeCount++;
                     } else {
@@ -336,7 +350,7 @@ public class ColourDraw_Activity extends Activity{
                         btn_width.setText(" size " + String.valueOf(paintStroke));
                         sizeCount = 0;
                     }
-                    break;
+                    break;*/
                    /*  这里面不能用for循环
                    for (int i =0 ;i<4;i++){
                         MySurfaceView.mPath.reset();//重置当前路径
@@ -356,7 +370,7 @@ public class ColourDraw_Activity extends Activity{
                     Intent shareIntent = new Intent(Intent.ACTION_SEND);
                     shareIntent.setType("image/jpg");
                     shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(surfaceView.saveImageToGallery().getAbsolutePath())); //"file:///sdcard/temporary_file.jpg"
-                    startActivity(Intent.createChooser(shareIntent, "Share Image"));
+                    startActivity(Intent.createChooser(shareIntent, "* 分享图片 *"));
                     break;
             }
 
