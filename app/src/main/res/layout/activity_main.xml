@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal">
+    android:orientation="vertical">
 <!--
     <LinearLayout
         android:layout_width="0dp"
@@ -15,10 +15,85 @@
 
     </LinearLayout>-->
 
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:weightSum="7"
+        android:gravity="center">
+<!--
+        <EditText
+            android:layout_width="0dp"
+            android:layout_weight="3"
+            android:layout_height="match_parent"
+            android:background="@color/PINK"
+            android:id="@+id/edit_text"
+            android:layout_marginRight="20dp"
+            android:paddingLeft="2dp"
+            android:hint="输入歌名" />-->
+
+        <Button
+            android:text="播放"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/bt_play"
+            android:layout_weight="1"
+            android:background="@color/PINK"
+            android:layout_marginRight="6dp" />
+
+        <Button
+            android:text="暂停"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/bt_pause"
+            android:layout_weight="1"
+            android:background="@color/PINK"
+            android:layout_marginRight="6dp" />
+
+
+        <Button
+            android:text="停止"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/bt_stop"
+            android:layout_weight="1"
+            android:background="@color/PINK"
+            android:layout_marginRight="6dp" />
+
+        <Button
+            android:text="重播"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/bt_replay"
+            android:layout_weight="1"
+            android:background="@color/PINK"
+            android:layout_marginRight="6dp" />
+
+        <Button
+            android:text="上一曲"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/bt_last"
+            android:layout_weight="1"
+            android:background="@color/PINK"
+            android:layout_marginRight="6dp" />
+
+        <Button
+            android:text="下一曲"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/bt_next"
+            android:layout_weight="1"
+            android:background="@color/PINK"
+            android:layout_marginRight="6dp" />
+    </LinearLayout>
+
     <ScrollView
         android:id="@+id/scrollView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_weight="19">
 
         <TableLayout
             android:layout_width="match_parent"

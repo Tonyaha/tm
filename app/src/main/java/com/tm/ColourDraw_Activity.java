@@ -86,7 +86,9 @@ public class ColourDraw_Activity extends Activity{
         *  SurfaceView 是一个view ，用实例或类来 接收数据
         *  MySurfaceView 在改activity里面
         */
-        MySurfaceView.myID = getIntent().getExtras().getInt("name");
+       MySurfaceView.myID = getIntent().getExtras().getInt("name");
+        /*Bundle bundle = this.getIntent().getExtras(); //第一种方法接收intent传递的数据，这里是id
+         MySurfaceView.myID  = bundle.getInt("name");*/
 
 
         mPaint.setStrokeWidth(paintStroke);//初始笔大小

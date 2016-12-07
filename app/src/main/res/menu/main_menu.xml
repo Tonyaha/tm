@@ -4,9 +4,9 @@
 
     <item
         android:id="@+id/user"
-        android:icon="@mipmap/title_user"
+        android:icon="@mipmap/music"
         android:orderInCategory="1"
-        android:title="用户"
+        android:title="音乐"
         app:showAsAction="always"/>
     <item
         android:id="@+id/more"
